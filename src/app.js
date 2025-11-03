@@ -17,6 +17,9 @@ const toast = document.getElementById("toast");
 
 const PLACEHOLDER = "???";
 let toastTimer;
+const speechSupported = "speechSynthesis" in window;
+let speechVoice = null;
+let speechSetup = false;
 
 const defaultState = () => ({
   remaining: [...ALL_IDS],
@@ -32,6 +35,7 @@ init();
 
 function init() {
   bindEvents();
+  initSpeech();
   if (state.remaining.length) {
     const candidate = selectInitialCurrent();
     setCurrentVerb(candidate, { reveal: state.revealAnswers, persist: false });
@@ -103,9 +107,13 @@ function handleAction(action) {
       handleReset(true);
       break;
     case "speak-present":
+      handleSpeak("present");
+      break;
     case "speak-past":
+      handleSpeak("past");
+      break;
     case "speak-participle":
-      showToast("El audio llegará pronto. ¡Sigue practicando!");
+      handleSpeak("participle");
       break;
     default:
       break;
@@ -313,12 +321,24 @@ function updateButtons() {
   const rememberButton = document.querySelector('[data-action="remember"]');
   const nextButton = document.querySelector('[data-action="next"]');
   const resetButton = document.querySelector('[data-action="reset"]');
+  const speakButtons = document.querySelectorAll('[data-action^="speak-"]');
 
   toggleButton.disabled = !hasCurrent;
   rememberButton.disabled = !hasCurrent || !state.remaining.includes(state.currentId);
   undoButton.disabled = state.history.length === 0;
   resetButton.disabled = state.learned.length === 0 && state.history.length === 0;
   nextButton.disabled = !state.remaining.length || (state.remaining.length === 1 && state.remaining[0] === state.currentId);
+  speakButtons.forEach((button) => {
+    const disabled = !speechSupported || !hasCurrent;
+    button.disabled = disabled;
+    if (!speechSupported) {
+      button.title = "Tu navegador no soporta audio todavía.";
+    } else if (!hasCurrent) {
+      button.removeAttribute("title");
+    } else {
+      button.title = "Reproducir pronunciación";
+    }
+  });
 }
 
 function showToast(message) {
@@ -345,4 +365,70 @@ function pickRandomId(pool) {
   if (!pool.length) return null;
   const index = Math.floor(Math.random() * pool.length);
   return pool[index];
+}
+
+function initSpeech() {
+  if (speechSetup) return;
+  speechSetup = true;
+
+  if (!speechSupported) {
+    return;
+  }
+
+  const synth = window.speechSynthesis;
+
+  const selectVoice = () => {
+    const voices = synth.getVoices();
+    if (!voices.length) return;
+
+    const preferredLangs = ["en-US", "en-GB", "en-AU", "en-CA", "en-IN", "en"].map((code) => code.toLowerCase());
+    const lower = (value) => value?.toLowerCase?.() ?? "";
+
+    const byExactMatch = preferredLangs
+      .map((code) => voices.find((voice) => lower(voice.lang) === code))
+      .find(Boolean);
+
+    const byPrefix = voices.find((voice) => lower(voice.lang).startsWith("en"));
+
+    speechVoice = byExactMatch || byPrefix || voices[0] || null;
+  };
+
+  selectVoice();
+  if (typeof synth.addEventListener === "function") {
+    synth.addEventListener("voiceschanged", selectVoice, { once: true });
+  } else if (typeof synth.onvoiceschanged === "object") {
+    synth.onvoiceschanged = selectVoice;
+  }
+}
+
+function handleSpeak(form) {
+  if (!speechSupported) {
+    showToast("Tu navegador no soporta el audio aún.");
+    return;
+  }
+
+  const verb = state.currentId !== null ? VERB_BY_ID.get(state.currentId) : null;
+  if (!verb) {
+    showToast("Primero selecciona un verbo.");
+    return;
+  }
+
+  const text = verb[form];
+  if (!text) {
+    showToast("No hay audio disponible.");
+    return;
+  }
+
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(text.replace("/", " or "));
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  if (speechVoice) {
+    utterance.voice = speechVoice;
+    utterance.lang = speechVoice.lang;
+  } else {
+    utterance.lang = "en-US";
+  }
+  synth.speak(utterance);
 }
