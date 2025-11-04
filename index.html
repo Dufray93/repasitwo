@@ -29,36 +29,49 @@
 
       <main class="layout">
         <section class="card verb-card" aria-live="polite">
-          <div class="card-head">
-            <h2 class="verb-title" id="spanishVerb">Verbo</h2>
-            <div class="progress">
-              <div class="progress-bar" id="progressBar"></div>
-              <span class="progress-label" id="progressLabel">Aprendidos: 0 / 0</span>
-            </div>
-          </div>
+          <div class="verb-layout">
+            <figure class="verb-media" aria-hidden="true">
+              <img
+                id="verbImage"
+                src="./src/assets/default-verb.svg"
+                alt="Ilustración representativa del verbo"
+                loading="lazy"
+              />
+            </figure>
 
-          <div class="table">
-            <div class="table-head">
-              <span>Verbo (ES)</span>
-              <span>Presente</span>
-              <span>Pasado</span>
-              <span>Participio</span>
-            </div>
-            <div class="table-row" id="verbRow">
-              <div class="cell cell-spanish">
-                <span class="cell-value" id="spanishCell">—</span>
+            <div class="verb-content">
+              <div class="card-head">
+                <h2 class="verb-title" id="spanishVerb">Verbo</h2>
+                <div class="progress">
+                  <div class="progress-bar" id="progressBar"></div>
+                  <span class="progress-label" id="progressLabel">Aprendidos: 0 / 0</span>
+                </div>
               </div>
-              <div class="cell">
-                <button class="cell-btn" data-action="speak-present" aria-label="Escuchar presente"></button>
-                <span class="cell-value" id="presentCell">—</span>
-              </div>
-              <div class="cell">
-                <button class="cell-btn" data-action="speak-past" aria-label="Escuchar pasado"></button>
-                <span class="cell-value" id="pastCell">—</span>
-              </div>
-              <div class="cell">
-                <button class="cell-btn" data-action="speak-participle" aria-label="Escuchar participio"></button>
-                <span class="cell-value" id="participleCell">—</span>
+
+              <div class="table" aria-live="polite">
+                <div class="table-head" aria-hidden="true">
+                  <span>Verbo (ES)</span>
+                  <span>Presente</span>
+                  <span>Pasado</span>
+                  <span>Participio</span>
+                </div>
+                <div class="table-row" id="verbRow">
+                  <div class="cell cell-spanish" data-label="Verbo (ES)">
+                    <span class="cell-value" id="spanishCell">—</span>
+                  </div>
+                  <div class="cell" data-label="Presente">
+                    <button class="cell-btn" data-action="speak-present" aria-label="Escuchar presente"></button>
+                    <span class="cell-value" id="presentCell">—</span>
+                  </div>
+                  <div class="cell" data-label="Pasado">
+                    <button class="cell-btn" data-action="speak-past" aria-label="Escuchar pasado"></button>
+                    <span class="cell-value" id="pastCell">—</span>
+                  </div>
+                  <div class="cell" data-label="Participio">
+                    <button class="cell-btn" data-action="speak-participle" aria-label="Escuchar participio"></button>
+                    <span class="cell-value" id="participleCell">—</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

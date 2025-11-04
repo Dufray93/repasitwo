@@ -14,6 +14,14 @@ const toggleButton = document.getElementById("toggleButton");
 const progressLabel = document.getElementById("progressLabel");
 const progressBar = document.getElementById("progressBar");
 const toast = document.getElementById("toast");
+const verbImage = document.getElementById("verbImage");
+const undoButton = document.querySelector('[data-action="undo"]');
+const rememberButton = document.querySelector('[data-action="remember"]');
+const nextButton = document.querySelector('[data-action="next"]');
+const resetButton = document.querySelector('[data-action="reset"]');
+const speakButtons = document.querySelectorAll('[data-action^="speak-"]');
+
+const DEFAULT_VERB_IMAGE = "./src/assets/default.jpg";
 
 const PLACEHOLDER = "???";
 let toastTimer;
@@ -36,6 +44,7 @@ init();
 function init() {
   bindEvents();
   initSpeech();
+  initImageFallback();
   if (state.remaining.length) {
     const candidate = selectInitialCurrent();
     setCurrentVerb(candidate, { reveal: state.revealAnswers, persist: false });
@@ -295,6 +304,7 @@ function renderVerb(id) {
       pastCell.textContent = "—";
       participleCell.textContent = "—";
     }
+    updateVerbImage(null);
     toggleButton.textContent = "Mostrar respuestas";
     return;
   }
@@ -304,6 +314,7 @@ function renderVerb(id) {
   presentCell.textContent = state.revealAnswers ? verb.present : PLACEHOLDER;
   pastCell.textContent = state.revealAnswers ? verb.past : PLACEHOLDER;
   participleCell.textContent = state.revealAnswers ? verb.participle : PLACEHOLDER;
+  updateVerbImage(verb);
   toggleButton.textContent = state.revealAnswers ? "Ocultar respuestas" : "Mostrar respuestas";
 }
 
@@ -317,17 +328,28 @@ function updateProgress() {
 
 function updateButtons() {
   const hasCurrent = state.currentId !== null;
-  const undoButton = document.querySelector('[data-action="undo"]');
-  const rememberButton = document.querySelector('[data-action="remember"]');
-  const nextButton = document.querySelector('[data-action="next"]');
-  const resetButton = document.querySelector('[data-action="reset"]');
-  const speakButtons = document.querySelectorAll('[data-action^="speak-"]');
 
-  toggleButton.disabled = !hasCurrent;
-  rememberButton.disabled = !hasCurrent || !state.remaining.includes(state.currentId);
-  undoButton.disabled = state.history.length === 0;
-  resetButton.disabled = state.learned.length === 0 && state.history.length === 0;
-  nextButton.disabled = !state.remaining.length || (state.remaining.length === 1 && state.remaining[0] === state.currentId);
+  if (toggleButton) {
+    toggleButton.disabled = !hasCurrent;
+  }
+
+  if (rememberButton) {
+    rememberButton.disabled = !hasCurrent || !state.remaining.includes(state.currentId);
+  }
+
+  if (undoButton) {
+    undoButton.disabled = state.history.length === 0;
+  }
+
+  if (resetButton) {
+    resetButton.disabled = state.learned.length === 0 && state.history.length === 0;
+  }
+
+  if (nextButton) {
+    nextButton.disabled =
+      !state.remaining.length || (state.remaining.length === 1 && state.remaining[0] === state.currentId);
+  }
+
   speakButtons.forEach((button) => {
     const disabled = !speechSupported || !hasCurrent;
     button.disabled = disabled;
@@ -367,6 +389,32 @@ function pickRandomId(pool) {
   return pool[index];
 }
 
+function initImageFallback() {
+  if (!verbImage) return;
+  verbImage.addEventListener(
+    "error",
+    () => {
+      if (verbImage.dataset.defaultApplied === "true") return;
+      verbImage.dataset.defaultApplied = "true";
+      verbImage.src = DEFAULT_VERB_IMAGE;
+    },
+    { passive: true }
+  );
+}
+
+function updateVerbImage(verb) {
+  if (!verbImage) return;
+  const newSrc = verb && verb.image ? verb.image : DEFAULT_VERB_IMAGE;
+  const previous = verbImage.dataset.currentSrc;
+  verbImage.dataset.defaultApplied = String(newSrc === DEFAULT_VERB_IMAGE);
+  verbImage.alt = verb ? `Ilustración del verbo ${verb.present}` : "Ilustración representativa del verbo";
+  if (previous === newSrc) {
+    return;
+  }
+  verbImage.dataset.currentSrc = newSrc;
+  verbImage.src = newSrc;
+}
+
 function initSpeech() {
   if (speechSetup) return;
   speechSetup = true;
@@ -396,7 +444,7 @@ function initSpeech() {
   selectVoice();
   if (typeof synth.addEventListener === "function") {
     synth.addEventListener("voiceschanged", selectVoice, { once: true });
-  } else if (typeof synth.onvoiceschanged === "object") {
+  } else if ("onvoiceschanged" in synth) {
     synth.onvoiceschanged = selectVoice;
   }
 }
@@ -421,7 +469,8 @@ function handleSpeak(form) {
 
   const synth = window.speechSynthesis;
   synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(text.replace("/", " or "));
+  const spokenText = text.replace(/\//g, " or ");
+  const utterance = new SpeechSynthesisUtterance(spokenText);
   utterance.rate = 0.95;
   utterance.pitch = 1;
   if (speechVoice) {
