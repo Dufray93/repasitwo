@@ -7,6 +7,15 @@
   --primary-soft: #125b94;
   --accent: #2ec4b6;
   --accent-soft: #e0f7f4;
+  --next-bg: #e6f1ff;
+  --next-text: #0b3f68;
+  --next-border: rgba(10, 61, 98, 0.2);
+  --remember-bg: #e7f6ed;
+  --remember-text: #1f7a55;
+  --remember-border: rgba(31, 122, 85, 0.22);
+  --toggle-bg: #f5f2ff;
+  --toggle-text: #463a7a;
+  --toggle-border: rgba(70, 58, 122, 0.18);
   --text: #1d2733;
   --text-soft: #4c5a67;
   --border: rgba(10, 61, 98, 0.18);
@@ -297,6 +306,29 @@ body {
   color: white;
 }
 
+.action#toggleButton {
+  background: var(--toggle-bg);
+  color: var(--toggle-text);
+  border: 1px solid var(--toggle-border);
+}
+
+.action#toggleButton:hover,
+.action#toggleButton:focus-visible {
+  background: #faf7ff;
+}
+
+.actions [data-action="next"] {
+  background: var(--next-bg);
+  color: var(--next-text);
+  border: 1px solid var(--next-border);
+}
+
+.actions [data-action="remember"] {
+  background: var(--remember-bg);
+  color: var(--remember-text);
+  border: 1px solid var(--remember-border);
+}
+
 .action.subtle {
   background: transparent;
   border: 1px solid var(--border);
@@ -306,6 +338,16 @@ body {
 .action:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 10px 18px -14px rgba(10, 61, 98, 0.5);
+}
+
+.actions [data-action="next"]:hover,
+.actions [data-action="next"]:focus-visible {
+  background: #f1f7ff;
+}
+
+.actions [data-action="remember"]:hover,
+.actions [data-action="remember"]:focus-visible {
+  background: #f0fbf5;
 }
 
 .hint {
@@ -543,6 +585,15 @@ body {
     --primary-soft: #a5d8ff;
     --accent: #66d9c3;
     --accent-soft: rgba(102, 217, 195, 0.18);
+    --next-bg: rgba(116, 192, 255, 0.2);
+    --next-text: #d6ebff;
+    --next-border: rgba(116, 192, 255, 0.4);
+    --remember-bg: rgba(102, 217, 195, 0.18);
+    --remember-text: #d7fff1;
+    --remember-border: rgba(102, 217, 195, 0.35);
+  --toggle-bg: rgba(149, 128, 255, 0.18);
+  --toggle-text: #e6ddff;
+  --toggle-border: rgba(149, 128, 255, 0.35);
     --text: #f1f5f9;
     --text-soft: #b6c2d1;
     --border: rgba(116, 192, 255, 0.35);
@@ -565,5 +616,20 @@ body {
 
   .progress-label {
     color: white;
+  }
+
+  .actions [data-action="next"]:hover,
+  .actions [data-action="next"]:focus-visible {
+    background: rgba(116, 192, 255, 0.28);
+  }
+
+  .actions [data-action="remember"]:hover,
+  .actions [data-action="remember"]:focus-visible {
+    background: rgba(102, 217, 195, 0.26);
+  }
+
+  .action#toggleButton:hover,
+  .action#toggleButton:focus-visible {
+    background: rgba(149, 128, 255, 0.26);
   }
 }
