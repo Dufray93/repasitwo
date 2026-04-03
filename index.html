@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Práctica de Verbos en Inglés</title>
+    <title>RepasiTwo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./src/styles.css" />
@@ -18,16 +18,34 @@
         <div class="brand">
           <span class="brand-icon">💬</span>
           <div class="brand-copy">
-            <h1>Práctica de Verbos</h1>
-            <p>Repite, recuerda y domina los tiempos verbales.</p>
+            <h1>RepasiTwo</h1>
+            <p id="modeSubtitle">Tarjetas de clase para presente, pasado y participio.</p>
+            <div class="meta-row">
+              <span class="meta-pill" id="activeCountBadge">Activos hoy: 0</span>
+            </div>
           </div>
         </div>
-        <button class="clear-storage" data-action="reset-all" aria-label="Restablecer progreso">
-          Restablecer progreso
-        </button>
+
+        <div class="header-actions">
+          <button class="class-refresh" data-action="reload-data" aria-label="Actualizar verbos activos">
+            Actualizar clase
+          </button>
+          <button class="clear-storage" data-action="reset-all" aria-label="Restablecer progreso">
+            Restablecer progreso
+          </button>
+        </div>
       </header>
 
       <main class="layout">
+        <section class="mode-tabs" role="tablist" aria-label="Tipo de práctica">
+          <button class="mode-tab is-active" id="tabVerbs" data-action="set-mode-verbs" role="tab" aria-selected="true">
+            Verbos
+          </button>
+          <button class="mode-tab" id="tabPhrasal" data-action="set-mode-phrasal" role="tab" aria-selected="false">
+            Phrasal Verbs
+          </button>
+        </section>
+
         <section class="card verb-card" aria-live="polite">
           <div class="verb-layout">
             <figure class="verb-media" aria-hidden="true">
@@ -44,30 +62,30 @@
                 <h2 class="verb-title" id="spanishVerb">Verbo</h2>
                 <div class="progress">
                   <div class="progress-bar" id="progressBar"></div>
-                  <span class="progress-label" id="progressLabel">Aprendidos: 0 / 0</span>
+                  <span class="progress-label" id="progressLabel">Aprendidos: 0 de 0 activos</span>
                 </div>
               </div>
 
               <div class="table" aria-live="polite">
                 <div class="table-head" aria-hidden="true">
-                  <span>Verbo (ES)</span>
-                  <span>Presente</span>
-                  <span>Pasado</span>
-                  <span>Participio</span>
+                  <span id="col1Head">Verbo (ES)</span>
+                  <span id="col2Head">Presente</span>
+                  <span id="col3Head">Pasado</span>
+                  <span id="col4Head">Participio</span>
                 </div>
                 <div class="table-row" id="verbRow">
-                  <div class="cell cell-spanish" data-label="Verbo (ES)">
+                  <div class="cell cell-spanish" id="col1Cell" data-label="Verbo (ES)">
                     <span class="cell-value" id="spanishCell">—</span>
                   </div>
-                  <div class="cell" data-label="Presente">
+                  <div class="cell" id="col2Cell" data-label="Presente">
                     <button class="cell-btn" data-action="speak-present" aria-label="Escuchar presente"></button>
                     <span class="cell-value" id="presentCell">—</span>
                   </div>
-                  <div class="cell" data-label="Pasado">
+                  <div class="cell" id="col3Cell" data-label="Pasado">
                     <button class="cell-btn" data-action="speak-past" aria-label="Escuchar pasado"></button>
                     <span class="cell-value" id="pastCell">—</span>
                   </div>
-                  <div class="cell" data-label="Participio">
+                  <div class="cell" id="col4Cell" data-label="Participio">
                     <button class="cell-btn" data-action="speak-participle" aria-label="Escuchar participio"></button>
                     <span class="cell-value" id="participleCell">—</span>
                   </div>
@@ -91,13 +109,21 @@
 
       <footer class="footer">
         <small>
-          Mantén tu racha diaria. Tu progreso se guarda automáticamente en este navegador.
+          Practica con regularidad para reforzar presente, pasado y participio.
         </small>
       </footer>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+    <script>
+      window.VERB_SHEET_CONFIG = {
+        // Si no hay URL de verbos, se usa src/verbsData.js como respaldo local.
+        verbsUrl: "https://opensheet.elk.sh/1xAwfLnHksscpzUEo6yYNwKxHhsHcnCrqAnAoSAuQP5I/verbos",
+        // Hoja de phrasal verbs con columnas: id, español, ingles, imagen, estado.
+        phrasalUrl: "https://opensheet.elk.sh/1xAwfLnHksscpzUEo6yYNwKxHhsHcnCrqAnAoSAuQP5I/phrasal"
+      };
+    </script>
     <script src="./src/verbsData.js" defer></script>
     <script src="./src/app.js" defer></script>
   </body>
